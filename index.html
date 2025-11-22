@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustAI – Advanced Dashboard 3.0</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* GLOBAL THEME */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(160deg, #0b0c10, #1f2833);
+    color: #fff;
+    overflow-x: hidden;
+}
+
+/* NAVBAR */
+.navbar {
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* HERO SECTION */
+.hero {
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+    overflow: hidden;
+}
+
+.hero-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 60px 40px;
+    backdrop-filter: blur(25px);
+    box-shadow: 0 0 60px rgba(0,255,255,0.2);
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    text-align: center;
+}
+
+.hero-card:hover {
+    transform: rotateY(10deg) rotateX(5deg) scale(1.05);
+    box-shadow: 0 0 100px rgba(0,255,255,0.6);
+}
+
+.hero h1 {
+    font-size: 3rem;
+    color: #0dcaf0;
+    text-shadow: 0 0 15px #0dcaf0;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-top: 15px;
+    color: #fff;
+}
+
+/* BUTTONS */
+.btn-neo {
+    background: linear-gradient(45deg, #0dcaf0, #6610f2);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 50px;
+    transition: 0.3s ease;
+    box-shadow: 0 0 15px rgba(0,255,255,0.4);
+}
+
+.btn-neo:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 0 25px rgba(0,255,255,0.7);
+}
+
+/* DASHBOARD CARDS */
+.dash-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 25px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 20px rgba(0,200,255,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dash-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 0 35px rgba(0,200,255,0.5);
+}
+
+/* TOGGLE SWITCH */
+.form-check-input {
+    width: 2.5em;
+    height: 1.2em;
+    cursor: pointer;
+}
+
+/* MODAL */
+.modal-content {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(25px);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 20px;
+}
+
+/* RADAR CHART CARD */
+.radar-card {
+    margin-top: 20px;
+}
+
+/* FOOTER */
+footer {
+    margin-top: 50px;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 0.9rem;
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand text-info fw-bold fs-3">TrustAI</a>
+        <span class="text-white-50">Explainable AI Framework for Banking</span>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero mt-5">
+    <div class="hero-card">
+        <h1>TrustAI 3.0</h1>
+        <p>Next-Gen Explainable AI Dashboard with Transparency, Control & Real-Time Insights</p>
+        <button class="btn-neo mt-4" onclick="scrollToDashboard()">
+            Explore Dashboard <i class="bi bi-arrow-down-circle"></i>
+        </button>
+    </div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="container py-5">
+    <h2 class="fw-bold text-center mb-5 text-info">AI Decision Dashboard</h2>
+
+    <div class="row g-4">
+
+        <!-- CREDIT SCORE -->
+        <div class="col-lg-4 col-md-6">
+            <div class="dash-card text-center">
+                <h4 class="text-info">Credit Score</h4>
+                <canvas id="creditChart" height="180"></canvas>
+                <button class="btn-neo mt-3" onclick="showExplanation('credit')">View Explanation</button>
+            </div>
+        </div>
+
+        <!-- FRAUD SCORE -->
+        <div class="col-lg-4 col-md-6">
+            <div class="dash-card text-center">
+                <h4 class="text-danger">Fraud Risk</h4>
+                <canvas id="fraudChart" height="180"></canvas>
+                <button class="btn-neo mt-3" onclick="showExplanation('fraud')">View Explanation</button>
+            </div>
+        </div>
+
+        <!-- PERSONALIZED OFFERS -->
+        <div class="col-lg-4 col-md-12">
+            <div class="dash-card text-center">
+                <h4 class="text-success">Personalized Offers</h4>
+                <canvas id="offersChart" height="180"></canvas>
+                <button class="btn-neo mt-3" onclick="showExplanation('offers')">View Explanation</button>
+            </div>
+        </div>
+
+        <!-- CUSTOMER CONSENT -->
+        <div class="col-12">
+            <div class="dash-card">
+                <h4 class="text-info text-center">Customer Consent</h4>
+                <div class="row text-center mt-3">
+                    <div class="col-md-4">
+                        <p>Transaction Analysis</p>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" checked onchange="toggleConsent('transaction')">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <p>Personalization</p>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" onchange="toggleConsent('personalization')">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <p>Risk Assessment</p>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" checked onchange="toggleConsent('risk')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RISK RADAR -->
+        <div class="col-12 radar-card">
+            <div class="dash-card text-center">
+                <h4 class="text-warning">Risk Assessment Radar</h4>
+                <canvas id="riskRadar" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal fade" id="explainModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <h4 class="text-info">AI Decision Explanation</h4>
+            <p id="explanationText" class="mt-3 fs-5"></p>
+            <button class="btn-neo mt-2" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    © 2025 TrustAI – Advanced Dashboard 3.0
+</footer>
+
+<!-- BOOTSTRAP JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// SMOOTH SCROLL
+function scrollToDashboard() {
+    document.getElementById("dashboard").scrollIntoView({ behavior: "smooth" });
+}
+
+/* ================== CHARTS ================== */
+new Chart(document.getElementById('creditChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ["Approved", "Risk"],
+        datasets: [{
+            data: [75,25],
+            backgroundColor: ["#0dcaf0", "#6610f2"]
+        }]
+    },
+    options: { responsive:true, animation:{animateRotate:true, duration:1500} }
+});
+
+new Chart(document.getElementById('fraudChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ["Safe","Risk"],
+        datasets:[{data:[85,15], backgroundColor:["#0f0","#f00"]}]
+    },
+    options:{responsive:true, animation:{animateScale:true}}
+});
+
+new Chart(document.getElementById('offersChart'), {
+    type: 'bar',
+    data: {
+        labels:["Loan Discount","Credit Card Offer","Savings Bonus"],
+        datasets:[{
+            label:"Offer Score",
+            data:[70,50,90],
+            backgroundColor:["#0dcaf0","#6610f2","#0f0"]
+        }]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}}}
+});
+
+new Chart(document.getElementById('riskRadar'), {
+    type: 'radar',
+    data:{
+        labels:["Credit Risk","Fraud Risk","Operational Risk","Market Risk","Compliance Risk"],
+        datasets:[{
+            label:"Risk Score",
+            data:[70,50,60,40,65],
+            backgroundColor:"rgba(255,69,0,0.3)",
+            borderColor:"#ff4500",
+            pointBackgroundColor:"#ff6347"
+        }]
+    },
+    options:{responsive:true, scales:{r:{beginAtZero:true,max:100}}}
+});
+
+/* ================== EXPLANATION MODAL ================== */
+function showExplanation(type){
+    let text="";
+    if(type==="credit"){
+        text=`<b>Credit Score Explanation:</b><br>
+        • 42% – Payment History<br>
+        • 30% – Credit Utilization<br>
+        • 15% – Income Stability<br>
+        • 13% – No Negative Flags<br><b>Decision:</b> Approved`;
+    } else if(type==="fraud"){
+        text=`<b>Fraud Analysis Explanation:</b><br>
+        • 60% – Known Device<br>
+        • 25% – Normal Pattern<br>
+        • 15% – Minor Anomalies<br><b>Decision:</b> Low Risk`;
+    } else if(type==="offers"){
+        text=`<b>Personalized Offers Explanation:</b><br>
+        • Loan Discount: 70% fit<br>
+        • Credit Card Offer: 50% fit<br>
+        • Savings Bonus: 90% fit`;
+    }
+
+    document.getElementById("explanationText").innerHTML=text;
+    var modal=new bootstrap.Modal(document.getElementById('explainModal'));
+    modal.show();
+}
+
+/* ================== CONSENT TOGGLE ================== */
+function toggleConsent(consent){
+    alert("Consent for "+consent+" toggled!");
+}
+</script>
+
+</body>
+</html>
